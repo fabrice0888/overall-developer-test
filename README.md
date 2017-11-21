@@ -23,7 +23,7 @@
 
 * ***1. The Backend***
   * Using a Four Square library, hard code into the script a location/s.
-  * Using the Geo information from this, collect photos from Instagram for this/these locations
+  * Using the Geo information from this, collect photos from Flickr for this/these locations
   * Save the image URL and relevant information (Description etc) into a database.
   * Ensure that if the task is run more than once, no duplicates are added to the database.
   
