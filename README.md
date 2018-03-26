@@ -15,6 +15,7 @@
 ## Please use the following tools as part of your solution:
 * Database: SQL Server (any version or edition)
 * API: MVC, WebApi or NancyFx
+* Infrastructure: Dependency Injection
 * ORM: NHibernate or Entity Framework
 * Testing: xUnit or NUnit
 * HTML(5)
