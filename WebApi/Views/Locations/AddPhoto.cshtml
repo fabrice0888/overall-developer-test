@@ -1,0 +1,226 @@
+﻿@model WebApi.Models.Location
+
+@{
+    ViewBag.Title = "Add Photo";
+}
+@Styles.Render("~/bundles/datatables/css")
+<h2>Add Photo for <span id="LocName"> </span></h2>
+
+
+<div class="panel" Style="padding: 5px;">
+
+
+    <ul class="nav nav-tabs text-center">
+        <li class="active">
+            <a data-uri="p1" data-toggle="tab" href="#p1"><span class="glyphicon glyphicon-tasks "></span> Add to your favorites</a>
+     
+        </li>
+        
+    </ul>
+    <div class="tab-content">
+
+        <div id="p1" class="tab-pane active">
+            <div class="panel-body">
+                <div>The following images are retrived from flickr based on the geo coordinates of the above location</div>
+                <div>Please click save to store your favorite images on your account</div>
+                    @*<input id="txtSearch" type="text"/><button type="button" id="btnSearch">Search online</button>*@
+
+                @*<div>
+                    <p>
+                        <ul id="fImages" />
+                    </p>
+                </div>*@  
+                <table id="picTable" class="table table-striped table-bordered table-hover responsive" width="100%">
+                    <thead class="thin-border-bottom">
+                        <tr>
+                            <th>Title</th>
+                            <th>Image</th>                          
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+@Scripts.Render("~/bundles/datatables/js")
+    <script>
+
+        var username = Cookies.get('username');
+        var password = Cookies.get('password');
+
+        var locId = "";
+        var lng = "";
+        var lat = "";
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+          };
+
+   
+        getLocation();         
+        function getLocation () {
+
+            locId =  getUrlParameter('locId')
+            $.ajax({
+                type: "GET",
+                url: '/api/location/' + locId,
+                contentType: "application/json",
+                beforeSend: function (xhr) {
+
+                    xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+                },
+                success: function (data, status, xhr) {
+
+                    $("#LocName").html(data.Name);
+                    lng = data.Long;
+                    lat = data.Lat;
+
+                    createLocTable();
+                },
+                error: function (data, status, xhr) {
+
+                }
+            });
+        }
+        //$('#btnSearch').click(function () {
+
+
+        //    //var txtVal = $("#txtSearch").val();
+
+        //    //if (txtVal == "")
+        //    //    return;   
+
+        //    $.ajax({
+        //        type: "GET",
+        //        //  url: '/api/location/photo/' + txtVal,
+        //        url: '/api/location/photo/lng/' + lng + '/lat/' + lat + '/',           
+        //        contentType: 'application/json',
+        //        beforeSend: function (xhr) {
+
+        //            xhr.setRequestHeader("Authorization", "Basic " + btoa('username' + ":" + 'password'));
+        //        },
+        //        success: function (data, status, xhr) {
+
+        //            $("#fImages").html('');
+
+        //            $.each(data, function (key, item) {
+
+        //                var row = '<li> Title:' + item.Title + ' <img src="' + item .Url+ '" /> <a  data-id="' + item.Id + '" class="itemCart" > Save </a> </li>';
+        //                $("#fImages").append(row);
+        //            });
+
+        //        },
+        //        error: function (data, status, xhr) {
+
+        //        }
+        //    });
+        //});
+
+        function createLocTable() {
+            $("#picTable").DataTable({
+                "sDom": "<'row'<'col-sm-6'><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
+                //processing: true,
+                //serverSide: true,
+                "ajax": {
+                    "url": '/api/location/photo/lng/' + lng + '/lat/' + lat + '/',
+                    "beforeSend": function (xhr) {
+                        xhr.setRequestHeader("Authorization",
+                           "Basic " + btoa(username + ":" + password));
+                    }
+                },
+
+                "aoColumns": [
+                  //{ "data": "Title" },
+                    {
+                        "mData": null,
+                        render: function (data, type, row) {
+ 
+                            if (data.Title == "")
+                                return "No description available";
+                            else
+                                return data.Title;
+
+                        },
+
+                    },
+                   {
+                       "mData": null,
+                       render: function (data, type, row) {
+
+                           return '<img src="' + data.Url + '" />';
+
+                          
+                       },
+
+                   },
+                   {
+                       "mData": null,
+                       render: function (data, type, row) {
+
+                           return '<a data-id=' + data.Id + ' data-url="' + data.Url + '" data-title="' + data.Title + '" class="saveImg">Save Photo<i aria-hidden="true"></i></a>';
+
+                            
+                       },
+
+                   },
+
+                ],
+                "language": {
+                    "emptyTable": "There are no data at present.",
+                    "zeroRecords": "There were no matching data found."
+                },
+                responsive: true,
+            });
+        }
+
+        $("#picTable").on("click", "a.saveImg", function () {
+
+            var Id = $(this).data('id');
+            var Title = $(this).data('title');
+            var Url = $(this).data('url');
+
+            $.ajax({
+            
+                //url: '/api/location/photo/Id' + $(this).data('id'),           
+                type: "POST",
+                data: JSON.stringify({ Id: Id, Title: Title, Url: Url , LocId: locId }),
+                url: '/api/location/favorites',
+                dataType: 'json',
+                contentType: "application/json",
+                beforeSend: function (xhr) {
+
+                    xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+                },
+                success: function (data, status, xhr) {
+
+                   alert("Saved!")
+                },
+                error: function (data, status, xhr) {
+
+                }
+            });
+        });
+    </script>
+}

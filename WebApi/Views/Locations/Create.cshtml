@@ -1,0 +1,164 @@
+﻿@model WebApi.Models.Location
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Add Location</h2>
+
+
+<div class="panel" Style="padding: 5px;">
+
+
+    <ul class="nav nav-tabs text-center">
+        <li class="active"><a data-uri="p1" data-toggle="tab" href="#p1"><span class="glyphicon glyphicon-tasks "></span> Search or Add Manually</a></li>       
+
+    </ul>
+    <div class="tab-content">
+
+        <div id="p1" class="tab-pane active">
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-horizontal">
+                        <input id="txtSearch" type="text"/><button type="button" id="btnSearch">Search online</button>
+                        <br /><br />
+                        <div>Searching will fetch locations from the foursquare library (e.g type Mauritius or Port Louis), you may add manually as well</div>
+                        <hr />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Long, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Long, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Long, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Lat, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Lat, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Lat, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="button" id="btnSave" value="Save" class="btn btn-default" />
+                                <input type="button" id="btnClear" value="Clear" class="btn btn-default" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+  
+    </div>
+
+</div>
+
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+
+
+    <script>
+
+        var username = Cookies.get('username');
+        var password = Cookies.get('password');
+
+        $('#btnClear').click(function () {
+
+            clearForm();
+        });
+
+        function clearForm()
+        {
+            $("#Name").val('');
+            $("#Long").val('');
+            $("#Lat").val('');
+        }
+        $('#btnSearch').click(function () {
+
+
+            var txtVal = $("#txtSearch").val();
+
+            if (txtVal == "")
+                return;
+
+            $.ajax({
+                type: "GET",
+                url: '/api/location/' + txtVal,
+                contentType: 'application/json',
+                beforeSend: function (xhr) {
+
+                    clearForm();
+                    xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+                },
+                success: function (data, status, xhr) {
+            
+                    if (data.Name == "")
+                    {
+                        alert("No Data Found!");
+                    }
+                    else
+                    {
+                        $("#Name").val(data.Name);
+                        $("#Long").val(data.Long);
+                        $("#Lat").val(data.Lat);
+                    }
+                   
+                },
+                error: function (data, status, xhr) {
+               
+                }
+            });
+        });
+
+        $('#btnSave').click(function () {
+
+
+            $.ajax({
+                type: "POST",        
+                data: JSON.stringify({ Name: $("#Name").val(), Long: $("#Long").val(), Lat: $("#Lat").val() }),
+                url: '/api/postLocation',        
+                dataType: 'json',
+                contentType: "application/json",
+                beforeSend: function (xhr) {
+               
+                    xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+                },
+                success: function (data, status, xhr) {
+               
+                    alert("Saved");
+                    clearForm();
+                },
+                error: function (data, status, xhr) {
+                    console.log("ERR:" + data);
+                    alert("Already Exist");
+                }
+            });
+
+        
+        });
+
+    </script>
+}

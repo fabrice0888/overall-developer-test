@@ -1,0 +1,92 @@
+﻿@model WebApi.Models.User
+ 
+@{
+    ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_LayoutBlank.cshtml";
+}
+
+<h2>@ViewBag.Title.</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+            @using (Html.BeginForm("", "", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+     
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+           
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="button"  id="btnLogin" value="Log in" class="btn btn-default" />
+                    </div>
+                </div>
+                <p>
+                    @Html.ActionLink("Register as a new user", "Register")
+                </p>
+             
+            }
+        </section>
+    </div>
+ 
+</div>
+
+@section Scripts {
+    
+
+<script>
+
+
+        $('#btnLogin').click(function () {
+
+
+            if ($("#Email").val().length == "" || $("#Password").val() == "" )
+            {
+                alert("All fields required!");
+                return;
+            }
+ 
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({ Email: $("#Email").val(), Password: $("#Password").val() }),
+                url: '/api/account/login',
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data, status, xhr) {
+
+                    if (data == "true" || data == "True" || data == true) {
+
+                        Cookies.set("username", $("#Email").val(), { expires: 1 });
+                        Cookies.set("password", $("#Password").val(), { expires: 1 });
+
+                        window.location = "/Home/Index";
+                    }
+                    else {
+                        alert("Invalid Credentials!");
+                    }
+                },
+                error: function (data, status, xhr) {
+
+                }
+            });
+
+
+        });
+
+</script>
+}

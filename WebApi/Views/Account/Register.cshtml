@@ -1,0 +1,80 @@
+﻿@model WebApi.Models.Register
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutBlank.cshtml";
+
+}
+
+<h2>@ViewBag.Title.</h2>
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <h4>Create a new account.</h4>
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" id="btnSave" class="btn btn-default" value="Register" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+ 
+
+
+    <script>
+
+        $('#btnSave').click(function () {
+
+
+            if ($("#Email").val().length == "" || $("#Password").val() == "" || $("#ConfirmPassword").val() == "")
+            {
+                alert("All fields required!");
+                return;
+            }
+
+            if ($("#Password").val() != $("#ConfirmPassword").val())
+            {
+                alert("Password don't match!");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({ Email: $("#Email").val(), Password: $("#Password").val(), ConfirmPassword: $("#ConfirmPassword").val() }),
+                url: '/api/account/register',
+                dataType: 'json',
+                contentType: "application/json",         
+                success: function (data, status, xhr) {
+                    window.location = "/Account/Login";
+                },
+                error: function (data, status, xhr) {
+                   
+                }
+            });
+
+
+        });
+
+    </script>
+}

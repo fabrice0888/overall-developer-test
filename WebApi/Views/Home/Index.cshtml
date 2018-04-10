@@ -1,0 +1,38 @@
+﻿<div class="jumbotron">
+    <h1>ASP.NET WEB Api</h1>
+    <p class="lead">Technical assessment for backend and frontend developer.</p>
+  
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Introduction</h2>
+        <p>
+            The technologies used for that Web API include  ASP.NET MVC, Entity Framework, HTML(5), CSS(3),  Bootstrap, JavaScript, jQuery. <br />
+            There are two Api controllers in the project, namely AccountApi and LocationApi. The other controllers are only there to display the views. <br />
+            All data manipulaions are done using the WebApi only.
+            <br/>
+            The project should normally cover the  1. The Backend, 2. The Frontend and the 3. Bonus.
+
+        </p>
+    </div>
+    <div class="col-md-4">
+        <h2>Important Notes </h2>
+         As stated in the assessment, a basic authentication has been used instead of the asp.net identity. The basic authentication has been used for the application together with cookies, as well with the API libraries. 
+         Therefore the authourisation credentials must be passed in order to gain access to the Api. Anonymous is only used for login and register. The BasicAuthenticationAttribute class is reponsible for this.
+        <br />
+        Cross-Origin Requests (cors) request has been enabled in the project so that the application can be hosted on a remote server. It can be tested using Postman, note that basic authentication is required too. 
+        <br />
+        Accounts have been created on foursquare.com and flickr.com so as to gain access to the APIs. Secret key is embeded in the project.
+    </div>
+    <div class="col-md-4">
+        <h2>Getting Started</h2>
+         After login, you will have access to the menus Home, Location, Api and Logout. Home is that current page, Location about the assement itself, Api is the default asp help API tool descripion, and Logout will destroy the session.
+        <br>
+         To start go to location, here will be a list of locations stored by the user, empty on first use. Instead of hardcoding the geo coord, you can create one manually or search online using the foursqure library(ext API) by providing a name.
+        <br/>
+        Once a location with the geo coord added. You will be able to edit or remove the location. You can collect photos from Flickr(ext API) for these locations using the "Add Photo" button next to the record.
+        You can then decide to save the picture url and description using the "save photo". Back to the list of locations, you may view your saved images using the "View Saved Images" button.
+    </div>
+</div>
+
+
